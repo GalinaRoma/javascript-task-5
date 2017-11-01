@@ -25,7 +25,9 @@ function getEmitter() {
          * @returns {Object}
          */
         on: function (event, context, handler) {
-            events.push({ event, context, handler });
+            if (event !== '' && event !== '.') {
+                events.push({ event, context, handler });
+            }
 
             return this;
         },
@@ -44,7 +46,9 @@ function getEmitter() {
             });
             eventsToDelete.forEach((elem) => {
                 const currentIndex = events.indexOf(elem);
-                events.splice(currentIndex, 1);
+                if (currentIndex !== -1) {
+                    events.splice(currentIndex, 1);
+                }
             });
 
             return this;
