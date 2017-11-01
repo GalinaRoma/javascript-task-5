@@ -40,15 +40,13 @@ function getEmitter() {
          */
         off: function (event, context) {
             const eventsToDelete = events.filter((currentEventObj) => {
-                return ((currentEventObj.event.indexOf(event + '.') !== -1 ||
+                return ((currentEventObj.event.startsWith(event + '.') ||
                     currentEventObj.event === event) &&
                     currentEventObj.context === context);
             });
             eventsToDelete.forEach((elem) => {
                 const currentIndex = events.indexOf(elem);
-                if (currentIndex !== -1) {
-                    events.splice(currentIndex, 1);
-                }
+                events.splice(currentIndex, 1);
             });
 
             return this;
