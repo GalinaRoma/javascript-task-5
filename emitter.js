@@ -13,7 +13,7 @@ module.exports = getEmitter;
  * @returns {Object}
  */
 function getEmitter() {
-    const events = [];
+    let events = [];
 
     return {
 
@@ -39,17 +39,17 @@ function getEmitter() {
          * @returns {Object}
          */
         off: function (event, context) {
-            const eventsToDelete = events.filter((currentEventObj) => {
-                return ((currentEventObj.event.startsWith(event + '.') ||
-                    currentEventObj.event === event) &&
-                    currentEventObj.context === context);
-            });
-            eventsToDelete.forEach((elem) => {
-                const currentIndex = events.indexOf(elem);
-                events.splice(currentIndex, 1);
-            });
+            events = events
+                .filter(currentEventObj => {
+                    return !containsCurrentEvent(currentEventObj) ||
+                        !(currentEventObj.context === context);
+                });
 
             return this;
+            function containsCurrentEvent(currentEventObj) {
+                return currentEventObj.event.startsWith(event + '.') ||
+                    currentEventObj.event === event;
+            }
         },
 
         /**
@@ -58,15 +58,16 @@ function getEmitter() {
          * @returns {Object}
          */
         emit: function (event) {
-            const eventsToEmit = event.split('.');
-            while (eventsToEmit.length !== 0) {
-                const elem = eventsToEmit.join('.');
-                events.forEach((currentEventObj) => {
-                    if (currentEventObj.event === elem) {
-                        currentEventObj.handler.call(currentEventObj.context);
-                    }
-                });
-                eventsToEmit.pop();
+            const eventParts = event.split('.');
+
+            while (eventParts.length !== 0) {
+                const elem = eventParts.join('.');
+
+                events
+                    .filter(currentEventObj => currentEventObj.event === elem)
+                    .forEach(currentEventObj =>
+                        currentEventObj.handler.call(currentEventObj.context));
+                eventParts.pop();
             }
 
             return this;
