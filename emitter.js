@@ -41,15 +41,14 @@ function getEmitter() {
         off: function (event, context) {
             events = events
                 .filter(currentEventObj => {
-                    return !containsCurrentEvent(currentEventObj) ||
+                    const containsCurrentEvent = currentEventObj.event.startsWith(event + '.') ||
+                        currentEventObj.event === event;
+
+                    return !containsCurrentEvent ||
                         !(currentEventObj.context === context);
                 });
 
             return this;
-            function containsCurrentEvent(currentEventObj) {
-                return currentEventObj.event.startsWith(event + '.') ||
-                    currentEventObj.event === event;
-            }
         },
 
         /**
